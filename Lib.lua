@@ -131,7 +131,7 @@ end
 local GuiName = "CryptionHub"
 
 function CryptionHub:CreateWindow(title, gameName, intro)
-    title = title or "<font color=\"#1CB2F5\">CFA Hub Premium</font>"
+    title = title or "<font color=\"#1CB2F5\">Cryption Hub</font>"
     gameName = gameName or "N/A"
 
     for _, v in pairs(CoreGui:GetChildren()) do
@@ -141,7 +141,7 @@ function CryptionHub:CreateWindow(title, gameName, intro)
     end
 
     local themes = {
-        SchemaColor = Color3.fromRGB(79, 195, 247),
+        SchemaColor = Color3.fromRGB(69,69,207),
         TextColor = Color3.fromRGB(255, 255, 255),
         Header = Color3.fromRGB(22, 22, 22),
         Container = Color3.fromRGB(34, 34, 34),
@@ -150,7 +150,7 @@ function CryptionHub:CreateWindow(title, gameName, intro)
         Drop = Color3.fromRGB(28, 28, 28),
         ScrollBar = Color3.fromRGB(149, 149, 149),
         NotiBackground = Color3.fromRGB(0, 0, 0),
-        Glow = Color3.fromRGB(79, 195, 247),
+        Glow = Color3.fromRGB(69,69,207),
         Logo = "rbxassetid://12362528321"
     }
 
