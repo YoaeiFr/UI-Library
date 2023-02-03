@@ -132,7 +132,7 @@ local GuiName = "CryptionHub"
 
 function CryptionHub:CreateWindow(title, gameName, intro)
     title = title or "<font color=\"#1CB2F5\">Cryption Hub</font>"
-    gameName = gameName or game.Players.LocalPlayer.UserId.. ""
+    gameName = gameName or "N/A"
 
     for _, v in pairs(CoreGui:GetChildren()) do
         if v:IsA("ScreenGui") and v.Name == GuiName then
