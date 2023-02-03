@@ -151,7 +151,7 @@ function CryptionHub:CreateWindow(title, gameName, intro)
         ScrollBar = Color3.fromRGB(149, 149, 149),
         NotiBackground = Color3.fromRGB(0, 0, 0),
         Glow = Color3.fromRGB(79, 195, 247),
-        Logo = "rbxassetid://7409401226"
+        Logo = "rbxassetid://12362528321"
     }
 
     table.insert(CryptionHub, title)
