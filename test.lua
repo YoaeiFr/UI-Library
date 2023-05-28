@@ -1,6 +1,8 @@
 local ESP = {
-    Enabled = true,
+    Enabled = false,
     Boxes = true,
+    BoxShift = CFrame.new(0,-1.5,0),
+    BoxSize = Vector3.new(4,6,0),
     Color = Color3.fromRGB(255,255,255),
     FaceCamera = false,
     Names = true,
@@ -10,9 +12,8 @@ local ESP = {
     TeamMates = true,
     Players = true,
     
-    Objects = {}
+    Objects = setmetatable({}, {__mode="kv"}),
     Overrides = {}
-    setmetatable(Objects, { __mode = "kv" })
  }
  
  
@@ -185,14 +186,13 @@ local ESP = {
     end
     local size = self.Size
     local locs = {
-        TopLeft = cf * CFrame.new(0,-1.5,0) * CFrame.new(size.X/2,size.Y/2,0),
-        TopRight = cf * CFrame.new(0,-1.5,0) * CFrame.new(-size.X/2,size.Y/2,0),
-        BottomLeft = cf * CFrame.new(0,-1.5,0) * CFrame.new(size.X/2,-size.Y/2,0),
-        BottomRight = cf * CFrame.new(0,-1.5,0) * CFrame.new(-size.X/2,-size.Y/2,0),
-        TagPos = cf * CFrame.new(0,-1.5,0) * CFrame.new(0,size.Y/2,0),
-        Torso = cf * CFrame.new(0,-1.5,0),
+        TopLeft = cf * ESP.BoxShift * CFrame.new(size.X/2,size.Y/2,0),
+        TopRight = cf * ESP.BoxShift * CFrame.new(-size.X/2,size.Y/2,0),
+        BottomLeft = cf * ESP.BoxShift * CFrame.new(size.X/2,-size.Y/2,0),
+        BottomRight = cf * ESP.BoxShift * CFrame.new(-size.X/2,-size.Y/2,0),
+        TagPos = cf * ESP.BoxShift * CFrame.new(0,size.Y/2,0),
+        Torso = cf * ESP.BoxShift
     }
-    
  
     if ESP.Boxes then
         local TopLeft, Vis1 = WorldToViewportPoint(cam, locs.TopLeft.p)
@@ -279,7 +279,7 @@ local ESP = {
         Name = options.Name or obj.Name,
         Type = "Box",
         Color = options.Color,
-        Size = options.Size or self.Vector3.new(4,6,0),
+        Size = options.Size or self.BoxSize,
         Object = obj,
         Player = options.Player or plrs:GetPlayerFromCharacter(obj),
         PrimaryPart = options.PrimaryPart or obj.ClassName == "Model" and (obj.PrimaryPart or obj:FindFirstChild("HumanoidRootPart") or obj:FindFirstChildWhichIsA("BasePart")) or obj:IsA("BasePart") and obj,
