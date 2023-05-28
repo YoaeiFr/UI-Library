@@ -1,5 +1,5 @@
 local ESP = {
-    Enabled = false,
+    Enabled = true,
     Boxes = true,
     Color = Color3.fromRGB(255, 255, 255),
     FaceCamera = false,
