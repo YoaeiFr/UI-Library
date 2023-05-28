@@ -235,22 +235,15 @@ function ESP:GetTeam(p)
              self.Components.Health.Position = Vector2.new(TagPos.X, TagPos.Y + 28)
              self.Components.Health.Text = "[Health: " ..tostring(math.floor(self.Player.Character.Humanoid.Health + 0.5) .."/" .. math.floor(self.Player.Character.Humanoid.MaxHealth + 0.5)) .. "]"
              self.Components.Health.Color = color
-             
-             self.Components.DF.Visible = true
-             self.Components.DF.Position = Vector2.new(TagPos.X, TagPos.Y + 42)
-             self.Components.DF.Text = "[DF: " .. game.ReplicatedStorage["Stats" .. PlayerWithESP].Stats.DF.Value .. "]"
-             self.Components.DF.Color = color            
          else
              self.Components.Name.Visible = false
              self.Components.Distance.Visible = false
              self.Components.Health.Visible = false
-             self.Components.DF.Visible = false
          end
      else
          self.Components.Name.Visible = false
          self.Components.Distance.Visible = false
          self.Components.Health.Visible = false
-         self.Components.DF.Visible = false
      end
      
      if ESP.Tracers then
@@ -323,14 +316,6 @@ function ESP:GetTeam(p)
        Size = 19,
        Visible = self.Enabled and self.Names
      })
-     box.Components["DF"] = Draw("Text", {
-         Color = box.Color,
-         Center = true,
-         Outline = true,
-           Size = 19,
-           Visible = self.Enabled and self.Names
-      })
-    
     box.Components["Tracer"] = Draw("Line", {
        Thickness = ESP.Thickness,
        Color = box.Color,
