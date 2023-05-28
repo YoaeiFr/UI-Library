@@ -12,7 +12,7 @@ ESP.Thickness = 2
 ESP.AttachShift = 1
 ESP.TeamMates = true
 ESP.Players = true
-ESP.Objects = setmetatable({}, { __mode = "kv" })
+ESP.Objects = {}
 ESP.Overrides = {}
 
 local Players = game:GetService("Players")
@@ -20,16 +20,29 @@ local LocalPlayer = Players.LocalPlayer
 local Mouse = LocalPlayer:GetMouse()
 local Camera = workspace.CurrentCamera
 local Vector2_new = Vector2.new
-local WorldToViewportPoint = Camera.WorldToViewportPoint
 
-local function Draw(obj, props)
-    local new = Drawing.new(obj)
+local function DrawRectangle(size, position, color, thickness)
+    local rect = Drawing.new("Quad")
+    rect.Visible = true
+    rect.PointA = Vector2_new(position.X - size.X / 2, position.Y - size.Y / 2)
+    rect.PointB = Vector2_new(position.X + size.X / 2, position.Y - size.Y / 2)
+    rect.PointC = Vector2_new(position.X + size.X / 2, position.Y + size.Y / 2)
+    rect.PointD = Vector2_new(position.X - size.X / 2, position.Y + size.Y / 2)
+    rect.Color = color
+    rect.Thickness = thickness
+    return rect
+end
 
-    props = props or {}
-    for i, v in pairs(props) do
-        new[i] = v
-    end
-    return new
+local function DrawText(position, text, color)
+    local textLabel = Drawing.new("Text")
+    textLabel.Visible = true
+    textLabel.Position = position
+    textLabel.Text = text
+    textLabel.Color = color
+    textLabel.Size = 16
+    textLabel.Center = true
+    textLabel.Outline = true
+    return textLabel
 end
 
 function ESP:GetTeam(player)
@@ -74,12 +87,8 @@ function ESP:Toggle(enabled)
     if not enabled then
         for _, object in pairs(self.Objects) do
             if object.Type == "Box" then
-                if object.Temporary then
-                    object:Remove()
-                else
-                    for _, component in pairs(object.Components) do
-                        component.Visible = false
-                    end
+                for _, component in pairs(object.Components) do
+                    component:Remove()
                 end
             end
         end
@@ -169,7 +178,7 @@ function ESP:Add(object, options)
         local componentColor = self.Options.ColorDynamic and ESP:GetColor(self.Object) or ESP.Color
 
         if visible then
-            local _, pos = WorldToViewportPoint(Camera, cframe.p)
+            local pos = Camera:WorldToViewportPoint(cframe.Position)
             local display = ESP.Boxes and not ESP.FaceCamera or ESP.Boxes and ESP.FaceCamera and pos.Z > 0
             local o = self.Components.Box
             o.Visible = display
@@ -194,115 +203,36 @@ function ESP:Add(object, options)
                     name.Position = Vector2_new(o.Position.X, o.Position.Y - 20)
                     name.Text = self.Options.Name
                     name.Color = componentColor
-                    name.Transparency = 0.8
+                    name.Transparency = 1
                 end
             end
         else
-            local o = self.Components.Box
-            o.Visible = false
-
-            if self.Options.Name then
-                local name = self.Components.Name
-                name.Visible = false
+            for _, component in pairs(self.Components) do
+                component.Visible = false
             end
         end
-    end
-
-    local function NewComponent(name, props)
-        local component = Draw(name, props)
-        component.Visible = false
-        self.Components[name] = component
-        return component
-    end
-
-    if ESP.Boxes then
-        box.Components.Box = NewComponent("Rectangle", {
-            Thickness = 2,
-            Filled = false
-        })
-    end
-
-    if ESP.Names then
-        box.Components.Name = NewComponent("Text", {
-            Size = 16,
-            Outline = true,
-            Center = true,
-            Visible = false
-        })
     end
 
     self.Objects[object] = box
+
+    local components = {
+        Box = DrawRectangle(Vector2.new(0, 0), Vector2.new(0, 0), ESP.Color, ESP.Thickness),
+        Name = DrawText(Vector2.new(0, 0), "", ESP.Color)
+    }
+
+    for _, component in pairs(components) do
+        component.Visible = false
+    end
+
+    box.Components = components
+
+    if options.IsEnabled == nil then
+        box.IsEnabled = true
+    else
+        box.IsEnabled = options.IsEnabled
+    end
+
+    box:Update()
+
     return box
 end
-
-function ESP:Init()
-    ESP.Toggle(true)
-
-    ESP:AddObjectListener(workspace, {
-        Type = "Model",
-        Name = "Humanoid",
-        Validator = function(c)
-            return c:FindFirstChildOfClass("Humanoid") and not c:FindFirstChildOfClass("Tool")
-        end,
-        PrimaryPart = function(c)
-            return c:FindFirstChild("Head") or c.PrimaryPart
-        end,
-        CustomName = function(c)
-            return c:FindFirstChildOfClass("Humanoid").Parent.Name
-        end,
-        Color = function(c)
-            return ESP:GetColor(ESP:GetPlayerFromChar(c))
-        end,
-        IsEnabled = function(c)
-            return not ESP:IsTeamMate(ESP:GetPlayerFromChar(c)) or ESP.TeamMates
-        end
-    })
-
-    Players.PlayerAdded:Connect(function(player)
-        ESP:AddObjectListener(player.Character, {
-            Type = "Model",
-            Name = "Humanoid",
-            Validator = function(c)
-                return c:FindFirstChildOfClass("Humanoid") and not c:FindFirstChildOfClass("Tool")
-            end,
-            PrimaryPart = function(c)
-                return c:FindFirstChild("Head") or c.PrimaryPart
-            end,
-            CustomName = function(c)
-                return c:FindFirstChildOfClass("Humanoid").Parent.Name
-            end,
-            Color = function(c)
-                return ESP:GetColor(player)
-            end,
-            IsEnabled = function(c)
-                return not ESP:IsTeamMate(player) or ESP.TeamMates
-            end,
-            OnAdded = function(box)
-                player.CharacterAdded:Connect(function(char)
-                    box:Remove()
-                    ESP:AddObjectListener(char, {
-                        Type = "Model",
-                        Name = "Humanoid",
-                        Validator = function(c)
-                            return c:FindFirstChildOfClass("Humanoid") and not c:FindFirstChildOfClass("Tool")
-                        end,
-                        PrimaryPart = function(c)
-                            return c:FindFirstChild("Head") or c.PrimaryPart
-                        end,
-                        CustomName = function(c)
-                            return c:FindFirstChildOfClass("Humanoid").Parent.Name
-                        end,
-                        Color = function(c)
-                            return ESP:GetColor(player)
-                        end,
-                        IsEnabled = function(c)
-                            return not ESP:IsTeamMate(player) or ESP.TeamMates
-                        end
-                    })
-                end)
-            end
-        })
-    end)
-end
-
-ESP:Init()
