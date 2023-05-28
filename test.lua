@@ -1,6 +1,6 @@
 local ESP = {}
 
-ESP.Enabled = false
+ESP.Enabled = true
 ESP.Boxes = true
 ESP.BoxShift = CFrame.new(0, -1.5, 0)
 ESP.BoxSize = Vector3.new(4, 6, 0)
