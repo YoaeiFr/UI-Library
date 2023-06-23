@@ -1,4 +1,3 @@
-
 local CryptionHub = {}
 
 warn("Preparing UI...")
