@@ -5,22 +5,20 @@ local Library = {
 
 Library.Theme = {
     FontSize = 15,
-    TitleSize = 18,
+    TitleSize = 20,
     Font = Enum.Font.Code,
     BackGround = "rbxassetid://5553946656",
     TileSize = 90,
-    Cursor = false,
-    CursorImagie = "https://t0.rbxcdn.com/42f66da98c40252ee151326a82aab51f",
     BackGroundColor = Color3.fromRGB(20, 20, 20),
     TabsTextColor = Color3.fromRGB(240, 240, 240),
     BorderColor = Color3.fromRGB(60, 60, 60),
     AccentColor = Color3.fromRGB(255, 255, 255),
-    SecondAccentColor = Color3.fromRGB(16, 31, 78),
+    SecondAccentColor = Color3.fromRGB(0, 0, 0),
     OutlineColor = Color3.fromRGB(60, 60, 60),
     SecondOutlineColor = Color3.fromRGB(0, 0, 0),
     SectionColor = Color3.fromRGB(30, 30, 30),
     TopTextColor = Color3.fromRGB(255, 255, 255),
-    TopHeight = 48,
+    TopHeight = 50,
     TopColor = Color3.fromRGB(30, 30, 30),
     SecondTopColor = Color3.fromRGB(30, 30, 30),
     ButtonColor = Color3.fromRGB(49, 49, 49),
@@ -29,180 +27,10 @@ Library.Theme = {
     SecondItemsColor = Color3.fromRGB(210, 210, 210)
 }
 
-if Library.Theme.Cursor and Drawing then
-    local success = pcall(function() 
-        Library.Cursor = Drawing.new("Image")
-        Library.Cursor.Data = game:HttpGet(Library.Theme.CursorImagie)
-        Library.Cursor.Size = Vector2.new(64, 64)
-        Library.Cursor.Visible = game:GetService("UserInputService").MouseEnabled
-        Library.Cursor.Rounding = 0
-        Library.Cursor.Position = Vector2.new(game:GetService("Players").LocalPlayer:GetMouse().X - 32, game:GetService("Players").LocalPlayer:GetMouse().Y + 6)
-    end)
-    if success and Library.Cursor then
-        game:GetService("UserInputService").InputChanged:Connect(function(input)
-            if game:GetService("UserInputService").MouseEnabled then
-                if input.UserInputType == Enum.UserInputType.MouseMovement then
-                    Library.Cursor.Position = Vector2.new(input.Position.X - 32, input.Position.Y + 7)
-                end
-            end
-        end)
-        
-        game:GetService("RunService").RenderStepped:Connect(function()
-            game:GetService("UserInputService").OverrideMouseIconBehavior = Enum.OverrideMouseIconBehavior.ForceHide
-            Library.Cursor.Visible = game:GetService("UserInputService").MouseEnabled and (game:GetService("UserInputService").MouseIconEnabled or game:GetService("GuiService").MenuIsOpen)
-        end)
-    elseif not success and Library.Cursor then
-        Library.Cursor:Remove()
-    end
-end
-
-function Library:CreateWatermark(name, position)
-    local gamename = game:GetService("MarketplaceService"):GetProductInfo(game.PlaceId).Name
-    local watermark = { }
-    watermark.Visible = true
-    watermark.text = " " .. name:gsub("{game}", gamename):gsub("{fps}", "0 FPS") .. " "
-
-    watermark.main = Instance.new("ScreenGui", game:GetService("CoreGui"))
-    watermark.main.Name = "Watermark"
-    if syn then
-        syn.protect_gui(watermark.main)
-    end
-
-    if getgenv().watermark then
-        getgenv().watermark:Remove()
-    end
-    getgenv().watermark = watermark.main
-    
-    watermark.mainbar = Instance.new("Frame", watermark.main)
-    watermark.mainbar.Name = "Main"
-    watermark.mainbar.BorderColor3 = Color3.fromRGB(80, 80, 80)
-    watermark.mainbar.Visible = watermark.Visible
-    watermark.mainbar.BorderSizePixel = 0
-    watermark.mainbar.ZIndex = 5
-    watermark.mainbar.Position = UDim2.new(0, position and position.X or 10, 0, position and position.Y or 10)
-    watermark.mainbar.Size = UDim2.new(0, 0, 0, 25)
-
-    watermark.Gradient = Instance.new("UIGradient", watermark.mainbar)
-    watermark.Gradient.Rotation = 90
-    watermark.Gradient.Color = ColorSequence.new({ ColorSequenceKeypoint.new(0.00, Color3.fromRGB(40, 40, 40)), ColorSequenceKeypoint.new(1.00, Color3.fromRGB(10, 10, 10)) })
-
-    watermark.Outline = Instance.new("Frame", watermark.mainbar)
-    watermark.Outline.Name = "outline"
-    watermark.Outline.ZIndex = 4
-    watermark.Outline.BorderSizePixel = 0
-    watermark.Outline.Visible = watermark.Visible
-    watermark.Outline.BackgroundColor3 = Library.Theme.OutlineColor
-    watermark.Outline.Position = UDim2.fromOffset(-1, -1)
-
-    watermark.BlackOutline = Instance.new("Frame", watermark.mainbar)
-    watermark.BlackOutline.Name = "blackline"
-    watermark.BlackOutline.ZIndex = 3
-    watermark.BlackOutline.BorderSizePixel = 0
-    watermark.BlackOutline.BackgroundColor3 = Library.Theme.SecondOutlineColor
-    watermark.BlackOutline.Visible = watermark.Visible
-    watermark.BlackOutline.Position = UDim2.fromOffset(-2, -2)
-
-    watermark.label = Instance.new("TextLabel", watermark.mainbar)
-    watermark.label.Name = "FPSLabel"
-    watermark.label.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-    watermark.label.BackgroundTransparency = 1.000
-    watermark.label.Position = UDim2.new(0, 0, 0, 0)
-    watermark.label.Size = UDim2.new(0, 238, 0, 25)
-    watermark.label.Font = Library.Theme.Font
-    watermark.label.ZIndex = 6
-    watermark.label.Visible = watermark.Visible
-    watermark.label.Text = watermark.text
-    watermark.label.TextColor3 = Color3.fromRGB(255, 255, 255)
-    watermark.label.TextSize = 15
-    watermark.label.TextStrokeTransparency = 0.000
-    watermark.label.TextXAlignment = Enum.TextXAlignment.Left
-    watermark.label.Size = UDim2.new(0, watermark.label.TextBounds.X+10, 0, 25)
-    
-    watermark.topbar = Instance.new("Frame", watermark.mainbar)
-    watermark.topbar.Name = "TopBar"
-    watermark.topbar.ZIndex = 6
-    watermark.topbar.BackgroundColor3 = Library.Theme.AccentColor
-    watermark.topbar.BorderSizePixel = 0
-    watermark.topbar.Visible = watermark.Visible
-    watermark.topbar.Size = UDim2.new(0, 0, 0, 1)
-
-    watermark.mainbar.Size = UDim2.new(0, watermark.label.TextBounds.X, 0, 25)
-    watermark.topbar.Size = UDim2.new(0, watermark.label.TextBounds.X+6, 0, 1)
-    watermark.Outline.Size = watermark.mainbar.Size + UDim2.fromOffset(2, 2)
-    watermark.BlackOutline.Size = watermark.mainbar.Size + UDim2.fromOffset(4, 4)
-
-    watermark.mainbar.Size = UDim2.new(0, watermark.label.TextBounds.X+4, 0, 25)    
-    watermark.label.Size = UDim2.new(0, watermark.label.TextBounds.X+4, 0, 25)
-    watermark.topbar.Size = UDim2.new(0, watermark.label.TextBounds.X+6, 0, 1)
-    watermark.Outline.Size = watermark.mainbar.Size + UDim2.fromOffset(2, 2)
-    watermark.BlackOutline.Size = watermark.mainbar.Size + UDim2.fromOffset(4, 4)
-
-    local startTime, counter, oldfps = os.clock(), 0, nil
-    game:GetService("RunService").Heartbeat:Connect(function()
-        watermark.label.Visible = watermark.Visible
-        watermark.mainbar.Visible = watermark.Visible
-        watermark.topbar.Visible = watermark.Visible
-        watermark.Outline.Visible = watermark.Visible
-        watermark.BlackOutline.Visible = watermark.Visible
-
-        if not name:find("{fps}") then
-            watermark.label.Text = " " .. name:gsub("{game}", gamename):gsub("{fps}", "0 FPS") .. " "
-        end
-
-        if name:find("{fps}") then
-            local currentTime = os.clock()
-            counter = counter + 1
-            if currentTime - startTime >= 1 then 
-                local fps = math.floor(counter / (currentTime - startTime))
-                counter = 0
-                startTime = currentTime
-
-                if fps ~= oldfps then
-                    watermark.label.Text = " " .. name:gsub("{game}", gamename):gsub("{fps}", fps .. " FPS") .. " "
-        
-                    watermark.label.Size = UDim2.new(0, watermark.label.TextBounds.X+10, 0, 25)
-                    watermark.mainbar.Size = UDim2.new(0, watermark.label.TextBounds.X, 0, 25)
-                    watermark.topbar.Size = UDim2.new(0, watermark.label.TextBounds.X, 0, 1)
-
-                    watermark.Outline.Size = watermark.mainbar.Size + UDim2.fromOffset(2, 2)
-                    watermark.BlackOutline.Size = watermark.mainbar.Size + UDim2.fromOffset(4, 4)
-                end
-                oldfps = fps
-            end
-        end
-    end)
-
-    watermark.mainbar.MouseEnter:Connect(function()
-        game:GetService("TweenService"):Create(watermark.mainbar, TweenInfo.new(0.1, Enum.EasingStyle.Linear, Enum.EasingDirection.In), { BackgroundTransparency = 1, Active = false }):Play()
-        game:GetService("TweenService"):Create(watermark.topbar, TweenInfo.new(0.1, Enum.EasingStyle.Linear, Enum.EasingDirection.In), { BackgroundTransparency = 1, Active = false }):Play()
-        game:GetService("TweenService"):Create(watermark.label, TweenInfo.new(0.1, Enum.EasingStyle.Linear, Enum.EasingDirection.In), { TextTransparency = 1, Active = false }):Play()
-        game:GetService("TweenService"):Create(watermark.Outline, TweenInfo.new(0.1, Enum.EasingStyle.Linear, Enum.EasingDirection.In), { BackgroundTransparency = 1, Active = false }):Play()
-        game:GetService("TweenService"):Create(watermark.BlackOutline, TweenInfo.new(0.1, Enum.EasingStyle.Linear, Enum.EasingDirection.In), { BackgroundTransparency = 1, Active = false }):Play()
-    end)
-    
-    watermark.mainbar.MouseLeave:Connect(function()
-        game:GetService("TweenService"):Create(watermark.mainbar, TweenInfo.new(0.1, Enum.EasingStyle.Linear, Enum.EasingDirection.In), { BackgroundTransparency = 0, Active = true }):Play()
-        game:GetService("TweenService"):Create(watermark.topbar, TweenInfo.new(0.1, Enum.EasingStyle.Linear, Enum.EasingDirection.In), { BackgroundTransparency = 0, Active = true }):Play()
-        game:GetService("TweenService"):Create(watermark.label, TweenInfo.new(0.1, Enum.EasingStyle.Linear, Enum.EasingDirection.In), { TextTransparency = 0, Active = true }):Play()
-        game:GetService("TweenService"):Create(watermark.Outline, TweenInfo.new(0.1, Enum.EasingStyle.Linear, Enum.EasingDirection.In), { BackgroundTransparency = 0, Active = true }):Play()
-        game:GetService("TweenService"):Create(watermark.BlackOutline, TweenInfo.new(0.1, Enum.EasingStyle.Linear, Enum.EasingDirection.In), { BackgroundTransparency = 0, Active = true }):Play()
-    end)
-
-    function watermark:UpdateTheme(Theme)
-        Theme = Theme or Library.Theme
-        watermark.Outline.BackgroundColor3 = Theme.OutlineColor
-        watermark.BlackOutline.BackgroundColor3 = Theme.SecondOutlineColor
-        watermark.label.Font = Theme.Font
-        watermark.topbar.BackgroundColor3 = Theme.AccentColor
-    end
-
-    return watermark
-end
-
-function Library:CreateWindow(name, size, hidebutton)
+function Library:CreateWindow(Name, size, hidebutton)
     local window = { }
 
-    window.name = name or ""
+    window.Name = Name or ""
     window.size = UDim2.fromOffset(size.X, size.Y) or UDim2.fromOffset(492, 598)
     window.hidebutton = hidebutton or Enum.KeyCode.RightShift
     window.Theme = Library.Theme
@@ -214,7 +42,7 @@ function Library:CreateWindow(name, size, hidebutton)
     end
 
     window.Main = Instance.new("ScreenGui", game:GetService("CoreGui"))
-    window.Main.Name = name
+    window.Main.Name = Name
     window.Main.DisplayOrder = 15
     if syn then
         syn.protect_gui(window.Main)
@@ -226,30 +54,30 @@ function Library:CreateWindow(name, size, hidebutton)
     getgenv().uilib = window.Main
 
     local dragging, dragInput, dragStart, startPos
-    game:GetService("UserInputService").InputChanged:Connect(function(input)
-        if input == dragInput and dragging then
-            local delta = input.Position - dragStart
+    game:GetService("UserInputService").InputChanged:Connect(function(Input)
+        if Input == dragInput and dragging then
+            local delta = Input.Position - dragStart
             window.Frame.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
         end
     end)
 
-    local dragstart = function(input)
-        if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+    local dragstart = function(Input)
+        if Input.UserInputType == Enum.UserInputType.MouseButton1 or Input.UserInputType == Enum.UserInputType.Touch then
             dragging = true
-            dragStart = input.Position
+            dragStart = Input.Position
             startPos = window.Frame.Position
             
-            input.Changed:Connect(function()
-                if input.UserInputState == Enum.UserInputState.End then
+            Input.Changed:Connect(function()
+                if Input.UserInputState == Enum.UserInputState.End then
                     dragging = false
                 end
             end)
         end
     end
 
-    local dragend = function(input)
-        if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then
-            dragInput = input
+    local dragend = function(Input)
+        if Input.UserInputType == Enum.UserInputType.MouseMovement or Input.UserInputType == Enum.UserInputType.Touch then
+            dragInput = Input
         end
     end
 
@@ -275,7 +103,7 @@ function Library:CreateWindow(name, size, hidebutton)
     local function checkIfGuiInFront(Pos)
         local objects = game:GetService("CoreGui"):GetGuiObjectsAtPosition(Pos.X, Pos.Y)
         for i,v in pairs(objects) do 
-            if not string.find(v:GetFullName(), window.name) then 
+            if not string.find(v:GetFullName(), window.Name) then 
                 table.remove(objects, i)
             end 
         end
@@ -335,7 +163,7 @@ function Library:CreateWindow(name, size, hidebutton)
 
     window.NameLabel = Instance.new("TextLabel", window.TopBar)
     window.NameLabel.TextColor3 = window.Theme.TopTextColor
-    window.NameLabel.Text = window.name
+    window.NameLabel.Text = window.Name
     window.NameLabel.TextXAlignment = Enum.TextXAlignment.Left
     window.NameLabel.Font = window.Theme.Font
     window.NameLabel.Name = "title"
@@ -416,25 +244,25 @@ function Library:CreateWindow(name, size, hidebutton)
     window.OpenedColorPickers = { }
     window.Tabs = { }
 
-    function window:CreateTab(name)
+    function window:CreateTab(Name)
         local tab = { }
-        tab.name = name or ""
+        tab.Name = Name or ""
 
-        local size = game:GetService("TextService"):GetTextSize(tab.name, window.Theme.FontSize, window.Theme.Font, Vector2.new(200,300))
+        local size = game:GetService("TextService"):GetTextSize(tab.Name, window.Theme.FontSize, window.Theme.Font, Vector2.new(200,300))
 
         tab.TabButton = Instance.new("TextButton", window.TabList)
         tab.TabButton.TextColor3 = window.Theme.TabsTextColor
-        tab.TabButton.Text = tab.name
+        tab.TabButton.Text = tab.Name
         tab.TabButton.AutoButtonColor = false
         tab.TabButton.Font = window.Theme.Font
         tab.TabButton.TextYAlignment = Enum.TextYAlignment.Center
         tab.TabButton.BackgroundTransparency = 1
         tab.TabButton.BorderSizePixel = 0
         tab.TabButton.Size = UDim2.fromOffset(size.X + 15, window.TabList.AbsoluteSize.Y - 1)
-        tab.TabButton.Name = tab.name
+        tab.TabButton.Name = tab.Name
         tab.TabButton.TextSize = window.Theme.FontSize
         updateevent.Event:Connect(function(Theme)
-            local size = game:GetService("TextService"):GetTextSize(tab.name, Theme.FontSize, Theme.Font, Vector2.new(200,300))
+            local size = game:GetService("TextService"):GetTextSize(tab.Name, Theme.FontSize, Theme.Font, Vector2.new(200,300))
             tab.TabButton.TextColor3 = tab.TabButton.Name == "SelectedTab" and Theme.AccentColor or Theme.TabsTextColor
             tab.TabButton.Font = Theme.Font
             tab.TabButton.Size = UDim2.fromOffset(size.X + 15, window.TabList.AbsoluteSize.Y - 1)
@@ -517,13 +345,13 @@ function Library:CreateWindow(name, size, hidebutton)
         tab.SectorsLeft = { }
         tab.SectorsRight = { }
 
-        function tab:CreateSector(name,side)
+        function tab:CreateSector(Name,side)
             local sector = { }
-            sector.name = name or ""
+            sector.Name = Name or ""
             sector.side = side:lower() or "left"
             
             sector.Main = Instance.new("Frame", sector.side == "left" and tab.Left or tab.Right) 
-            sector.Main.Name = sector.name:gsub(" ", "") .. "Sector"
+            sector.Main.Name = sector.Name:gsub(" ", "") .. "Sector"
             sector.Main.BorderSizePixel = 0
             sector.Main.ZIndex = 4
             sector.Main.Size = UDim2.fromOffset(window.size.X.Offset / 2 - 17, 20)
@@ -587,22 +415,22 @@ function Library:CreateWindow(name, size, hidebutton)
                 sector.BlackOutline2.BackgroundColor3 = Theme.SecondOutlineColor
             end)
 
-            local size = game:GetService("TextService"):GetTextSize(sector.name, 15, window.Theme.Font, Vector2.new(2000, 2000))
+            local size = game:GetService("TextService"):GetTextSize(sector.Name, 15, window.Theme.Font, Vector2.new(2000, 2000))
             sector.Label = Instance.new("TextLabel", sector.Main)
             sector.Label.AnchorPoint = Vector2.new(0,0.5)
             sector.Label.Position = UDim2.fromOffset(12, -1)
-            sector.Label.Size = UDim2.fromOffset(math.clamp(game:GetService("TextService"):GetTextSize(sector.name, 15, window.Theme.Font, Vector2.new(200,300)).X + 13, 0, sector.Main.Size.X.Offset), size.Y)
+            sector.Label.Size = UDim2.fromOffset(math.clamp(game:GetService("TextService"):GetTextSize(sector.Name, 15, window.Theme.Font, Vector2.new(200,300)).X + 13, 0, sector.Main.Size.X.Offset), size.Y)
             sector.Label.BackgroundTransparency = 1
             sector.Label.BorderSizePixel = 0
             sector.Label.ZIndex = 6
-            sector.Label.Text = sector.name
+            sector.Label.Text = sector.Name
             sector.Label.TextColor3 = Color3.new(1,1,2552/255)
             sector.Label.TextStrokeTransparency = 1
             sector.Label.Font = window.Theme.Font
             sector.Label.TextSize = 15
             updateevent.Event:Connect(function(Theme)
-                local size = game:GetService("TextService"):GetTextSize(sector.name, 15, Theme.Font, Vector2.new(2000, 2000))
-                sector.Label.Size = UDim2.fromOffset(math.clamp(game:GetService("TextService"):GetTextSize(sector.name, 15, Theme.Font, Vector2.new(200,300)).X + 13, 0, sector.Main.Size.X.Offset), size.Y)
+                local size = game:GetService("TextService"):GetTextSize(sector.Name, 15, Theme.Font, Vector2.new(2000, 2000))
+                sector.Label.Size = UDim2.fromOffset(math.clamp(game:GetService("TextService"):GetTextSize(sector.Name, 15, Theme.Font, Vector2.new(200,300)).X + 13, 0, sector.Main.Size.X.Offset), size.Y)
                 sector.Label.Font = Theme.Font
             end)
 
@@ -957,17 +785,17 @@ function Library:CreateWindow(name, size, hidebutton)
                         return keybind.value
                     end
 
-                    game:GetService("UserInputService").InputBegan:Connect(function(input, gameProcessed)
+                    game:GetService("UserInputService").InputBegan:Connect(function(Input, gameProcessed)
                         if not gameProcessed then
                             if keybind.Main.Text == "[...]" then
                                 keybind.Main.TextColor3 = Color3.fromRGB(136, 136, 136)
-                                if input.UserInputType == Enum.UserInputType.Keyboard then
-                                    keybind:Set(input.KeyCode)
+                                if Input.UserInputType == Enum.UserInputType.Keyboard then
+                                    keybind:Set(Input.KeyCode)
                                 else
                                     keybind:Set("None")
                                 end
                             else
-                                if keybind.value ~= "None" and input.KeyCode == keybind.value then
+                                if keybind.value ~= "None" and Input.KeyCode == keybind.value then
                                     toggle:Set(not toggle.CheckedFrame.Visible)
                                 end
                             end
@@ -1632,45 +1460,45 @@ function Library:CreateWindow(name, size, hidebutton)
                     local dragging_selector = false
                     local dragging_hue = false
 
-                    colorpicker.selector.InputBegan:Connect(function(input)
-                        if input.UserInputType == Enum.UserInputType.MouseButton1 then
+                    colorpicker.selector.InputBegan:Connect(function(Input)
+                        if Input.UserInputType == Enum.UserInputType.MouseButton1 then
                             dragging_selector = true
                             colorpicker:RefreshSelector()
                         end
                     end)
     
-                    colorpicker.selector.InputEnded:Connect(function(input)
-                        if input.UserInputType == Enum.UserInputType.MouseButton1 then
+                    colorpicker.selector.InputEnded:Connect(function(Input)
+                        if Input.UserInputType == Enum.UserInputType.MouseButton1 then
                             dragging_selector = false
                             colorpicker:RefreshSelector()
                         end
                     end)
 
-                    colorpicker.hue.InputBegan:Connect(function(input)
-                        if input.UserInputType == Enum.UserInputType.MouseButton1 then
+                    colorpicker.hue.InputBegan:Connect(function(Input)
+                        if Input.UserInputType == Enum.UserInputType.MouseButton1 then
                             dragging_hue = true
                             colorpicker:RefreshHue()
                         end
                     end)
     
-                    colorpicker.hue.InputEnded:Connect(function(input)
-                        if input.UserInputType == Enum.UserInputType.MouseButton1 then
+                    colorpicker.hue.InputEnded:Connect(function(Input)
+                        if Input.UserInputType == Enum.UserInputType.MouseButton1 then
                             dragging_hue = false
                             colorpicker:RefreshHue()
                         end
                     end)
     
-                    game:GetService("UserInputService").InputChanged:Connect(function(input)
-                        if dragging_selector and input.UserInputType == Enum.UserInputType.MouseMovement then
+                    game:GetService("UserInputService").InputChanged:Connect(function(Input)
+                        if dragging_selector and Input.UserInputType == Enum.UserInputType.MouseMovement then
                             colorpicker:RefreshSelector()
                         end
-                        if dragging_hue and input.UserInputType == Enum.UserInputType.MouseMovement then
+                        if dragging_hue and Input.UserInputType == Enum.UserInputType.MouseMovement then
                             colorpicker:RefreshHue()
                         end
                     end)
 
-                    local inputBegan = function(input)
-                        if input.UserInputType == Enum.UserInputType.MouseButton1 then
+                    local inputBegan = function(Input)
+                        if Input.UserInputType == Enum.UserInputType.MouseButton1 then
                             for i,v in pairs(window.OpenedColorPickers) do
                                 if v and i ~= colorpicker.MainPicker then
                                     i.Visible = false
@@ -1820,34 +1648,34 @@ function Library:CreateWindow(name, size, hidebutton)
                         slider:Set(value)
                     end
     
-                    slider.SlideBar.InputBegan:Connect(function(input)
-                        if input.UserInputType == Enum.UserInputType.MouseButton1 then
+                    slider.SlideBar.InputBegan:Connect(function(Input)
+                        if Input.UserInputType == Enum.UserInputType.MouseButton1 then
                             dragging = true
                             slider:Refresh()
                         end
                     end)
     
-                    slider.SlideBar.InputEnded:Connect(function(input)
-                        if input.UserInputType == Enum.UserInputType.MouseButton1 then
+                    slider.SlideBar.InputEnded:Connect(function(Input)
+                        if Input.UserInputType == Enum.UserInputType.MouseButton1 then
                             dragging = false
                         end
                     end)
     
-                    slider.Main.InputBegan:Connect(function(input)
-                        if input.UserInputType == Enum.UserInputType.MouseButton1 then
+                    slider.Main.InputBegan:Connect(function(Input)
+                        if Input.UserInputType == Enum.UserInputType.MouseButton1 then
                             dragging = true
                             slider:Refresh()
                         end
                     end)
     
-                    slider.Main.InputEnded:Connect(function(input)
-                        if input.UserInputType == Enum.UserInputType.MouseButton1 then
+                    slider.Main.InputEnded:Connect(function(Input)
+                        if Input.UserInputType == Enum.UserInputType.MouseButton1 then
                             dragging = false
                         end
                     end)
     
-                    game:GetService("UserInputService").InputChanged:Connect(function(input)
-                        if dragging and input.UserInputType == Enum.UserInputType.MouseMovement then
+                    game:GetService("UserInputService").InputChanged:Connect(function(Input)
+                        if dragging and Input.UserInputType == Enum.UserInputType.MouseMovement then
                             slider:Refresh()
                         end
                     end)
@@ -1860,8 +1688,8 @@ function Library:CreateWindow(name, size, hidebutton)
                 toggle.Main.MouseButton1Down:Connect(function()
                     toggle:Set(not toggle.CheckedFrame.Visible)
                 end)
-                toggle.Label.InputBegan:Connect(function(input)
-                    if input.UserInputType == Enum.UserInputType.MouseButton1 then
+                toggle.Label.InputBegan:Connect(function(Input)
+                    if Input.UserInputType == Enum.UserInputType.MouseButton1 then
                         toggle:Set(not toggle.CheckedFrame.Visible)
                     end
                 end)
@@ -2174,34 +2002,34 @@ function Library:CreateWindow(name, size, hidebutton)
                     slider:Set(value)
                 end
 
-                slider.SlideBar.InputBegan:Connect(function(input)
-                    if input.UserInputType == Enum.UserInputType.MouseButton1 then
+                slider.SlideBar.InputBegan:Connect(function(Input)
+                    if Input.UserInputType == Enum.UserInputType.MouseButton1 then
                         dragging = true
                         slider:Refresh()
                     end
                 end)
 
-                slider.SlideBar.InputEnded:Connect(function(input)
-                    if input.UserInputType == Enum.UserInputType.MouseButton1 then
+                slider.SlideBar.InputEnded:Connect(function(Input)
+                    if Input.UserInputType == Enum.UserInputType.MouseButton1 then
                         dragging = false
                     end
                 end)
 
-                slider.Main.InputBegan:Connect(function(input)
-                    if input.UserInputType == Enum.UserInputType.MouseButton1 then
+                slider.Main.InputBegan:Connect(function(Input)
+                    if Input.UserInputType == Enum.UserInputType.MouseButton1 then
                         dragging = true
                         slider:Refresh()
                     end
                 end)
 
-                slider.Main.InputEnded:Connect(function(input)
-                    if input.UserInputType == Enum.UserInputType.MouseButton1 then
+                slider.Main.InputEnded:Connect(function(Input)
+                    if Input.UserInputType == Enum.UserInputType.MouseButton1 then
                         dragging = false
                     end
                 end)
 
-				game:GetService("UserInputService").InputChanged:Connect(function(input)
-					if dragging and input.UserInputType == Enum.UserInputType.MouseMovement then
+				game:GetService("UserInputService").InputChanged:Connect(function(Input)
+					if dragging and Input.UserInputType == Enum.UserInputType.MouseMovement then
                         slider:Refresh()
 					end
 				end)
@@ -2761,45 +2589,45 @@ function Library:CreateWindow(name, size, hidebutton)
                 local dragging_selector = false
                 local dragging_hue = false
 
-                colorpicker.selector.InputBegan:Connect(function(input)
-                    if input.UserInputType == Enum.UserInputType.MouseButton1 then
+                colorpicker.selector.InputBegan:Connect(function(Input)
+                    if Input.UserInputType == Enum.UserInputType.MouseButton1 then
                         dragging_selector = true
                         colorpicker:RefreshSelector()
                     end
                 end)
 
-                colorpicker.selector.InputEnded:Connect(function(input)
-                    if input.UserInputType == Enum.UserInputType.MouseButton1 then
+                colorpicker.selector.InputEnded:Connect(function(Input)
+                    if Input.UserInputType == Enum.UserInputType.MouseButton1 then
                         dragging_selector = false
                         colorpicker:RefreshSelector()
                     end
                 end)
 
-                colorpicker.hue.InputBegan:Connect(function(input)
-                    if input.UserInputType == Enum.UserInputType.MouseButton1 then
+                colorpicker.hue.InputBegan:Connect(function(Input)
+                    if Input.UserInputType == Enum.UserInputType.MouseButton1 then
                         dragging_hue = true
                         colorpicker:RefreshHue()
                     end
                 end)
 
-                colorpicker.hue.InputEnded:Connect(function(input)
-                    if input.UserInputType == Enum.UserInputType.MouseButton1 then
+                colorpicker.hue.InputEnded:Connect(function(Input)
+                    if Input.UserInputType == Enum.UserInputType.MouseButton1 then
                         dragging_hue = false
                         colorpicker:RefreshHue()
                     end
                 end)
 
-                game:GetService("UserInputService").InputChanged:Connect(function(input)
-                    if dragging_selector and input.UserInputType == Enum.UserInputType.MouseMovement then
+                game:GetService("UserInputService").InputChanged:Connect(function(Input)
+                    if dragging_selector and Input.UserInputType == Enum.UserInputType.MouseMovement then
                         colorpicker:RefreshSelector()
                     end
-                    if dragging_hue and input.UserInputType == Enum.UserInputType.MouseMovement then
+                    if dragging_hue and Input.UserInputType == Enum.UserInputType.MouseMovement then
                         colorpicker:RefreshHue()
                     end
                 end)
 
-                local inputBegan = function(input)
-                    if input.UserInputType == Enum.UserInputType.MouseButton1 then
+                local inputBegan = function(Input)
+                    if Input.UserInputType == Enum.UserInputType.MouseButton1 then
                         for i,v in pairs(window.OpenedColorPickers) do
                             if v and i ~= colorpicker.MainPicker then
                                 i.Visible = false
@@ -2916,17 +2744,17 @@ function Library:CreateWindow(name, size, hidebutton)
                     return keybind.value
                 end
 
-                game:GetService("UserInputService").InputBegan:Connect(function(input, gameProcessed)
+                game:GetService("UserInputService").InputBegan:Connect(function(Input, gameProcessed)
                     if not gameProcessed then
                         if keybind.Bind.Text == "[...]" then
                             keybind.Bind.TextColor3 = Color3.fromRGB(136, 136, 136)
-                            if input.UserInputType == Enum.UserInputType.Keyboard then
-                                keybind:Set(input.KeyCode)
+                            if Input.UserInputType == Enum.UserInputType.Keyboard then
+                                keybind:Set(Input.KeyCode)
                             else
                                 keybind:Set("None")
                             end
                         else
-                            if keybind.value ~= "None" and input.KeyCode == keybind.value then
+                            if keybind.value ~= "None" and Input.KeyCode == keybind.value then
                                 pcall(keybind.callback)
                             end
                         end
@@ -3384,7 +3212,7 @@ function Library:CreateWindow(name, size, hidebutton)
         function tab:CreateConfigSystem(side)
             local configSystem = { }
 
-            configSystem.configFolder = window.name .. "/" .. tostring(game.PlaceId)
+            configSystem.configFolder = window.Name .. "/" .. tostring(game.PlaceId)
             if (not isfolder(configSystem.configFolder)) then
                 makefolder(configSystem.configFolder)
             end
