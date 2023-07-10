@@ -420,7 +420,6 @@ function Library:CreateWindow(name, size, hidebutton)
         local tab = { }
         tab.name = name or ""
 
-        local game:GetService("TextService") = game:GetService("TextService")
         local size = game:GetService("TextService"):GetTextSize(tab.name, window.Theme.FontSize, window.Theme.Font, Vector2.new(200,300))
 
         tab.TabButton = Instance.new("TextButton", window.TabList)
