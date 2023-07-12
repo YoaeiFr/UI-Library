@@ -3217,15 +3217,15 @@ function Library:CreateWindow(Name, Size, HideButton)
             return sector
         end
 
-        function tab:CreateConfigSystem(side)
+        function Tab:CreateConfigSystem(side)
             local configSystem = { }
 
-            configSystem.configFolder = window.name .. "/" .. tostring(game.PlaceId)
+            configSystem.configFolder = Window.Name .. "/" .. tostring(game.PlaceId)
             if (not isfolder(configSystem.configFolder)) then
                 makefolder(configSystem.configFolder)
             end
 
-            configSystem.sector = tab:CreateSector("Configs", side or "left")
+            configSystem.sector = Tab:CreateSector("Configs", side or "left")
 
             local ConfigName = configSystem.sector:AddTextbox("Config Name", "", ConfigName, function() end, "")
             local default = tostring(listfiles(configSystem.configFolder)[1] or ""):gsub(configSystem.configFolder .. "\\", ""):gsub(".txt", "")
@@ -3244,7 +3244,7 @@ function Library:CreateWindow(Name, Size, HideButton)
                 if ConfigName:Get() and ConfigName:Get() ~= "" then
                     local config = {}
     
-                    for i,v in pairs(library.flags) do
+                    for i,v in pairs(Library.Flags) do
                         if (v ~= nil and v ~= "") then
                             if (typeof(v) == "Color3") then
                                 config[i] = { v.R, v.G, v.B }
@@ -3258,7 +3258,7 @@ function Library:CreateWindow(Name, Size, HideButton)
                         end
                     end
     
-                    writefile(configSystem.configFolder .. "/" .. ConfigName:Get() .. ".txt", httpservice:JSONEncode(config))
+                    writefile(configSystem.configFolder .. "/" .. ConfigName:Get() .. ".txt", game:GetService("HttpService"):JSONEncode(config))
     
                     for i,v in pairs(listfiles(configSystem.configFolder)) do
                         if v:find(".txt") then
@@ -3271,7 +3271,7 @@ function Library:CreateWindow(Name, Size, HideButton)
             configSystem.Save = configSystem.sector:AddButton("Save", function()
                 local config = {}
                 if Config:Get() and Config:Get() ~= "" then
-                    for i,v in pairs(library.flags) do
+                    for i,v in pairs(Library.Flags) do
                         if (v ~= nil and v ~= "") then
                             if (typeof(v) == "Color3") then
                                 config[i] = { v.R, v.G, v.B }
@@ -3284,8 +3284,13 @@ function Library:CreateWindow(Name, Size, HideButton)
                             end
                         end
                     end
-    
-                    writefile(configSystem.configFolder .. "/" .. Config:Get() .. ".txt", httpservice:JSONEncode(config))
+
+                    configSystem.configFolderMainMenu = Window.Name .. "/" .. tostring("1730877806")
+                    if (not isfolder(configSystem.configFolderMainMenu)) then
+                        makefolder(configSystem.configFolderMainMenu)
+                    end
+                    writefile(configSystem.configFolder .. "/" .. Config:Get() .. ".txt", game:GetService("HttpService"):JSONEncode(config))
+                    writefile(configSystem.configFolderMainMenu .. "/" .. Config:Get() .. ".txt", game:GetService("HttpService"):JSONEncode(config))
                 end
             end)
 
@@ -3293,7 +3298,7 @@ function Library:CreateWindow(Name, Size, HideButton)
                 local Success = pcall(readfile, configSystem.configFolder .. "/" .. Config:Get() .. ".txt")
                 if (Success) then
                     pcall(function() 
-                        local ReadConfig = httpservice:JSONDecode(readfile(configSystem.configFolder .. "/" .. Config:Get() .. ".txt"))
+                        local ReadConfig = game:GetService("HttpService"):JSONDecode(readfile(configSystem.configFolder .. "/" .. Config:Get() .. ".txt"))
                         local NewConfig = {}
     
                         for i,v in pairs(ReadConfig) do
@@ -3310,10 +3315,10 @@ function Library:CreateWindow(Name, Size, HideButton)
                             end
                         end
     
-                        library.flags = NewConfig
+                        Library.Flags = NewConfig
     
-                        for i,v in pairs(library.flags) do
-                            for i2,v2 in pairs(library.items) do
+                        for i,v in pairs(Library.Flags) do
+                            for i2,v2 in pairs(Library.Items) do
                                 if (i ~= nil and i ~= "" and i ~= "Configs_Name" and i ~= "Configs" and v2.flag ~= nil) then
                                     if (v2.flag == i) then
                                         pcall(function() 
@@ -3345,11 +3350,11 @@ function Library:CreateWindow(Name, Size, HideButton)
 
             return configSystem
         end
-            
-            table.insert(Window.Tabs, Tab)
+
+        table.insert(Window.Tabs, Tab)
         return Tab
     end
-        
+
     return Window
 end
 
