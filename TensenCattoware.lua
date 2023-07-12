@@ -3217,111 +3217,106 @@ function Library:CreateWindow(Name, Size, HideButton)
             return sector
         end
 
-        function Tab:CreateConfigSystem(side)
+        function tab:CreateConfigSystem(side)
             local configSystem = { }
-        
-            configSystem.configFolder = Window.Name .. "/" .. tostring(game.PlaceId)
+
+            configSystem.configFolder = window.name .. "/" .. tostring(game.PlaceId)
             if (not isfolder(configSystem.configFolder)) then
                 makefolder(configSystem.configFolder)
             end
-        
-            configSystem.sector = Tab:CreateSector("Configs", side or "left")
-        
-            local ConfigName = configSystem.sector:AddTextbox("Config Name", "", "", function() end, "")
+
+            configSystem.sector = tab:CreateSector("Configs", side or "left")
+
+            local ConfigName = configSystem.sector:AddTextbox("Config Name", "", ConfigName, function() end, "")
             local default = tostring(listfiles(configSystem.configFolder)[1] or ""):gsub(configSystem.configFolder .. "\\", ""):gsub(".txt", "")
             local Config = configSystem.sector:AddDropdown("Configs", {}, default, false, function() end, "")
-            for i, v in pairs(listfiles(configSystem.configFolder)) do
+            for i,v in pairs(listfiles(configSystem.configFolder)) do
                 if v:find(".txt") then
                     Config:Add(tostring(v):gsub(configSystem.configFolder .. "\\", ""):gsub(".txt", ""))
                 end
             end
-        
+
             configSystem.Create = configSystem.sector:AddButton("Create", function()
-                for i, v in pairs(listfiles(configSystem.configFolder)) do
+                for i,v in pairs(listfiles(configSystem.configFolder)) do
                     Config:Remove(tostring(v):gsub(configSystem.configFolder .. "\\", ""):gsub(".txt", ""))
                 end
-        
+
                 if ConfigName:Get() and ConfigName:Get() ~= "" then
                     local config = {}
-        
-                    for i, v in pairs(Library.Flags) do
-                        if v ~= nil and v ~= "" then
-                            if typeof(v) == "Color3" then
+    
+                    for i,v in pairs(library.flags) do
+                        if (v ~= nil and v ~= "") then
+                            if (typeof(v) == "Color3") then
                                 config[i] = { v.R, v.G, v.B }
-                            elseif tostring(v):find("Enum.KeyCode") then
+                            elseif (tostring(v):find("Enum.KeyCode")) then
                                 config[i] = v.Name
-                            elseif typeof(v) == "table" then
+                            elseif (typeof(v) == "table") then
                                 config[i] = { v }
                             else
                                 config[i] = v
                             end
                         end
                     end
-        
-                    writefile(configSystem.configFolder .. "/" .. ConfigName:Get() .. ".txt", game:GetService("HttpService"):JSONEncode(config))
-        
-                    for i, v in pairs(listfiles(configSystem.configFolder)) do
+    
+                    writefile(configSystem.configFolder .. "/" .. ConfigName:Get() .. ".txt", httpservice:JSONEncode(config))
+    
+                    for i,v in pairs(listfiles(configSystem.configFolder)) do
                         if v:find(".txt") then
                             Config:Add(tostring(v):gsub(configSystem.configFolder .. "\\", ""):gsub(".txt", ""))
                         end
                     end
                 end
             end)
-        
+
             configSystem.Save = configSystem.sector:AddButton("Save", function()
                 local config = {}
                 if Config:Get() and Config:Get() ~= "" then
-                    for i, v in pairs(Library.Flags) do
-                        if v ~= nil and v ~= "" then
-                            if typeof(v) == "Color3" then
+                    for i,v in pairs(library.flags) do
+                        if (v ~= nil and v ~= "") then
+                            if (typeof(v) == "Color3") then
                                 config[i] = { v.R, v.G, v.B }
-                            elseif tostring(v):find("Enum.KeyCode") then
+                            elseif (tostring(v):find("Enum.KeyCode")) then
                                 config[i] = "Enum.KeyCode." .. v.Name
-                            elseif typeof(v) == "table" then
+                            elseif (typeof(v) == "table") then
                                 config[i] = { v }
                             else
                                 config[i] = v
                             end
                         end
                     end
-        
-                    configSystem.configFolderMainMenu = Window.Name .. "/" .. tostring("1730877806")
-                    if not isfolder(configSystem.configFolderMainMenu) then
-                        makefolder(configSystem.configFolderMainMenu)
-                    end
-                    writefile(configSystem.configFolder .. "/" .. Config:Get() .. ".txt", game:GetService("HttpService"):JSONEncode(config))
-                    writefile(configSystem.configFolderMainMenu .. "/" .. Config:Get() .. ".txt", game:GetService("HttpService"):JSONEncode(config))
+    
+                    writefile(configSystem.configFolder .. "/" .. Config:Get() .. ".txt", httpservice:JSONEncode(config))
                 end
             end)
-        
+
             configSystem.Load = configSystem.sector:AddButton("Load", function()
-                local Success, Result = pcall(readfile, configSystem.configFolder .. "/" .. Config:Get() .. ".txt")
-                if Success then
-                    pcall(function()
-                        local ReadConfig = game:GetService("HttpService"):JSONDecode(Result)
+                local Success = pcall(readfile, configSystem.configFolder .. "/" .. Config:Get() .. ".txt")
+                if (Success) then
+                    pcall(function() 
+                        local ReadConfig = httpservice:JSONDecode(readfile(configSystem.configFolder .. "/" .. Config:Get() .. ".txt"))
                         local NewConfig = {}
-        
-                        for i, v in pairs(ReadConfig) do
-                            if typeof(v) == "table" then
-                                if typeof(v[1]) == "number" then
+    
+                        for i,v in pairs(ReadConfig) do
+                            if (typeof(v) == "table") then
+                                if (typeof(v[1]) == "number") then
                                     NewConfig[i] = Color3.new(v[1], v[2], v[3])
-                                elseif typeof(v[1]) == "table" then
+                                elseif (typeof(v[1]) == "table") then
                                     NewConfig[i] = v[1]
                                 end
-                            elseif tostring(v):find("Enum.KeyCode.") then
+                            elseif (tostring(v):find("Enum.KeyCode.")) then
                                 NewConfig[i] = Enum.KeyCode[tostring(v):gsub("Enum.KeyCode.", "")]
                             else
                                 NewConfig[i] = v
                             end
                         end
-        
-                        Library.Flags = NewConfig
-        
-                        for i, v in pairs(Library.Flags) do
-                            for i2, v2 in pairs(Library.Items) do
-                                if i ~= nil and i ~= "" and i ~= "Configs_Name" and i ~= "Configs" and v2.flag ~= nil then
-                                    if v2.flag == i then
-                                        pcall(function()
+    
+                        library.flags = NewConfig
+    
+                        for i,v in pairs(library.flags) do
+                            for i2,v2 in pairs(library.items) do
+                                if (i ~= nil and i ~= "" and i ~= "Configs_Name" and i ~= "Configs" and v2.flag ~= nil) then
+                                    if (v2.flag == i) then
+                                        pcall(function() 
                                             v2:Set(v)
                                         end)
                                     end
@@ -3331,26 +3326,27 @@ function Library:CreateWindow(Name, Size, HideButton)
                     end)
                 end
             end)
-        
+
             configSystem.Delete = configSystem.sector:AddButton("Delete", function()
-                for i, v in pairs(listfiles(configSystem.configFolder)) do
+                for i,v in pairs(listfiles(configSystem.configFolder)) do
                     Config:Remove(tostring(v):gsub(configSystem.configFolder .. "\\", ""):gsub(".txt", ""))
                 end
-        
-                if not Config:Get() or Config:Get() == "" then return end
-                if not isfile(configSystem.configFolder .. "/" .. Config:Get() .. ".txt") then return end
+
+                if (not Config:Get() or Config:Get() == "") then return end
+                if (not isfile(configSystem.configFolder .. "/" .. Config:Get() .. ".txt")) then return end
                 delfile(configSystem.configFolder .. "/" .. Config:Get() .. ".txt")
-        
-                for i, v in pairs(listfiles(configSystem.configFolder)) do
+
+                for i,v in pairs(listfiles(configSystem.configFolder)) do
                     if v:find(".txt") then
                         Config:Add(tostring(v):gsub(configSystem.configFolder .. "\\", ""):gsub(".txt", ""))
                     end
                 end
             end)
-        
-            table.insert(Window.Tabs, Tab)
+
             return configSystem
         end
+            
+            table.insert(Window.Tabs, Tab)
         return Tab
     end
         
